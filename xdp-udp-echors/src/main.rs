@@ -1,10 +1,12 @@
 use anyhow::Context;
+use aya::maps::HashMap;
 use aya::programs::{Xdp, XdpFlags};
 use aya::{include_bytes_aligned, Ebpf};
 use aya_log::EbpfLogger;
 use clap::Parser;
-use log::{info, warn, debug};
+use log::{debug, info, warn};
 use tokio::signal;
+use xdp_udp_echors_common::BackendPorts;
 
 #[derive(Debug, Parser)]
 struct Opt {
@@ -49,7 +51,15 @@ async fn main() -> Result<(), anyhow::Error> {
     program.load()?;
     program.attach(&opt.iface, XdpFlags::default())
         .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
+    let mut backends: HashMap<_, u16, BackendPorts> =
+        HashMap::try_from(bpf.map_mut("BACKEND_PORTS").unwrap())?;
 
+    let mut ports: [u16; 4] = [0; 4];
+    ports[0] = 9876;
+    ports[1] = 9877;
+    ports[2] = 9878;
+    let backend_ports = BackendPorts { ports, index: 0 };
+    backends.insert(9875, backend_ports, 0)?;
     info!("Waiting for Ctrl-C...");
     signal::ctrl_c().await?;
     info!("Exiting...");

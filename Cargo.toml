@@ -1,2 +1,3 @@
 [workspace]
-members = ["xtask", "xdp-udp-echors", "xdp-udp-echors-common"]
+resolver = "2"
+members = ["xtask", "xdp-udp-echors", "xdp-udp-echors-common", "xdp-server"]

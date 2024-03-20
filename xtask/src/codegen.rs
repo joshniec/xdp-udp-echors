@@ -2,7 +2,7 @@ use aya_tool::generate::InputFile;
 use std::{fs::File, io::Write, path::PathBuf};
 
 pub fn generate() -> Result<(), anyhow::Error> {
-  let dir = PathBuf::from("xdp-udp-echors/src");
+  let dir = PathBuf::from("xdp-udp-echors-ebpf/src");
   let names: Vec<&str> = vec!["ethhdr", "ipv4hdr", "udphdr"];
   let bindings = aya_tool::generate(
     InputFile::Btf(PathBuf::from("/sys/kernel/btf/vmlinux")),
